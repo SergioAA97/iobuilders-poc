@@ -10,17 +10,17 @@ import com.picobankapi.poc.wallet.domain.WalletMovementEvent;
 import com.picobankapi.poc.wallet.domain.WalletNotEnoughFundsException;
 import com.picobankapi.poc.wallet.domain.WalletNotFoundException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class WalletServiceImpl implements WalletService {
 
-    @Autowired
-    private WalletRepository repository;
+    private final WalletRepository repository;
 
-    @Autowired
-    private WalletMovementEventEmitter emitter;
+    private final WalletMovementEventEmitter emitter;
 
     @Override
     public BigDecimal balance(Long id) {

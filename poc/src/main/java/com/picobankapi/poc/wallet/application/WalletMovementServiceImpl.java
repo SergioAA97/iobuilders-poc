@@ -8,14 +8,15 @@ import com.picobankapi.poc.wallet.application.port.out.WalletMovementRepository;
 import com.picobankapi.poc.wallet.domain.Wallet;
 import com.picobankapi.poc.wallet.domain.WalletMovement;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class WalletMovementServiceImpl implements WalletMovementService {
 
-    @Autowired
-    private WalletMovementRepository repository;
+    private final WalletMovementRepository repository;
 
     @Override
     public List<WalletMovement> movements(Long id) {

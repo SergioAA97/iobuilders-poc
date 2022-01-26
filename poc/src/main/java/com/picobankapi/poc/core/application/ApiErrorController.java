@@ -2,6 +2,8 @@ package com.picobankapi.poc.core.application;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.picobankapi.poc.core.domain.ApiError;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;

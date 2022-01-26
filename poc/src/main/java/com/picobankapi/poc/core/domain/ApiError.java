@@ -1,4 +1,4 @@
-package com.picobankapi.poc.core.application;
+package com.picobankapi.poc.core.domain;
 
 import org.springframework.http.HttpStatus;
 

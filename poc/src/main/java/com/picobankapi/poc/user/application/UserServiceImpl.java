@@ -11,17 +11,17 @@ import com.picobankapi.poc.user.domain.UserAlreadyExistsException;
 import com.picobankapi.poc.user.domain.UserNotFoundException;
 import com.picobankapi.poc.user.domain.UserRegisteredEvent;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository repository;
+    private final UserRepository repository;
 
-    @Autowired
-    private UserRegisteredEventEmitter eventEmitter;
+    private final UserRegisteredEventEmitter eventEmitter;
 
     @Override
     public List<User> getUsers() {
