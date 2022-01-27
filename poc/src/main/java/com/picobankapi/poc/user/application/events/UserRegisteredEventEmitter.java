@@ -2,15 +2,16 @@ package com.picobankapi.poc.user.application.events;
 
 import com.picobankapi.poc.user.domain.UserRegisteredEvent;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class UserRegisteredEventEmitter {
 
-    @Autowired
-    private ApplicationEventPublisher publisher;
+    private final ApplicationEventPublisher publisher;
 
     public void publish(UserRegisteredEvent event) {
         publisher.publishEvent(event);

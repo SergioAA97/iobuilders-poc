@@ -1,5 +1,6 @@
 package com.picobankapi.poc.wallet.application;
 
+import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
 
 import com.picobankapi.poc.core.application.ApiErrorController;
@@ -18,8 +19,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
+@Order(0)
+@Priority(1)
 public class WalletExceptionController extends ApiErrorController {
 
     @Override
@@ -28,20 +30,23 @@ public class WalletExceptionController extends ApiErrorController {
         return handleError(status, ex);
     }
 
-    @ExceptionHandler(value = WalletNotEnoughFundsException.class)
-    public @ResponseBody ResponseEntity<Object> handleUserAlreadyExists(final Exception ex,
+    @ExceptionHandler(WalletNotEnoughFundsException.class)
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public @ResponseBody ResponseEntity<Object> handleWalletNotEnoguhFunds(final Exception ex,
             final HttpServletRequest request) {
         return handleError(HttpStatus.CONFLICT, ex);
     }
 
-    @ExceptionHandler(value = WalletNotFoundException.class)
-    public @ResponseBody ResponseEntity<Object> handleUserNotFound(final Exception ex,
+    @ExceptionHandler(WalletNotFoundException.class)
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public @ResponseBody ResponseEntity<Object> handleWalletNotFound(final Exception ex,
             final HttpServletRequest request) {
         return handleError(HttpStatus.NOT_FOUND, ex);
     }
 
     @ExceptionHandler(value = WalletException.class)
-    public @ResponseBody ResponseEntity<Object> handleUserError(final Exception ex,
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public @ResponseBody ResponseEntity<Object> handleWalletError(final Exception ex,
             final HttpServletRequest request) {
         return handleError(HttpStatus.INTERNAL_SERVER_ERROR, ex);
     }

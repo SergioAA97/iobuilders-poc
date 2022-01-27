@@ -1,6 +1,7 @@
 package com.picobankapi.poc.wallet.application;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import com.picobankapi.poc.wallet.application.events.WalletMovementEventEmitter;
 import com.picobankapi.poc.wallet.application.port.in.WalletService;
@@ -23,35 +24,40 @@ public class WalletServiceImpl implements WalletService {
     private final WalletMovementEventEmitter emitter;
 
     @Override
-    public BigDecimal balance(Long id) {
+    public BigDecimal balance(Long id) throws WalletNotFoundException {
         Wallet wallet = repository.getById(id);
         if (wallet == null)
-            return BigDecimal.ZERO;
+            throw new WalletNotFoundException(id);
         return wallet.getBalance();
     }
 
     @Override
     public void deposit(Long id, BigDecimal amnt) throws WalletNotFoundException {
-        Wallet wallet = repository.getById(id);
-        if (wallet == null) {
+        Optional<Wallet> opWallet = repository.findById(id);
+        if (!opWallet.isPresent()) {
             throw new WalletNotFoundException(id);
+        } else {
+            Wallet wallet = opWallet.get();
+            wallet.deposit(amnt);
+            emitter.publish(new WalletMovementEvent(this, null, wallet, amnt));
+            repository.save(wallet);
         }
-        wallet.deposit(amnt);
-        emitter.publish(new WalletMovementEvent(this, null, wallet, amnt));
-        repository.save(wallet);
     }
 
     @Override
     public void withdraw(Long id, BigDecimal amnt) throws WalletNotEnoughFundsException, WalletNotFoundException {
-        Wallet wallet = repository.getById(id);
-        if (wallet == null)
+        Optional<Wallet> opWallet = repository.findById(id);
+        if (!opWallet.isPresent()) {
             throw new WalletNotFoundException(id);
-        boolean withdrawn = wallet.withdraw(amnt);
-        if (withdrawn) {
-            emitter.publish(new WalletMovementEvent(this, wallet, null, amnt));
-            repository.save(wallet);
         } else {
-            throw new WalletNotEnoughFundsException(id);
+            Wallet wallet = opWallet.get();
+            boolean withdrawn = wallet.withdraw(amnt);
+            if (withdrawn) {
+                emitter.publish(new WalletMovementEvent(this, wallet, null, amnt));
+                repository.save(wallet);
+            } else {
+                throw new WalletNotEnoughFundsException(id);
+            }
         }
     }
 
@@ -71,7 +77,10 @@ public class WalletServiceImpl implements WalletService {
         if (walletTgt == null) {
             throw new WalletNotFoundException(tgtId);
         }
-        walletSrc.withdraw(amnt);
+        boolean withdrawn = walletSrc.withdraw(amnt);
+        if (!withdrawn) {
+            throw new WalletNotEnoughFundsException(srcId);
+        }
         walletTgt.deposit(amnt);
         emitter.publish(new WalletMovementEvent(this, walletSrc, walletTgt, amnt));
         repository.save(walletSrc);

@@ -2,12 +2,15 @@ package com.picobankapi.poc.user.application;
 
 import java.util.List;
 
+import javax.validation.ConstraintViolationException;
+
 import com.picobankapi.poc.core.domain.InvalidArgumentsException;
 import com.picobankapi.poc.user.application.events.UserRegisteredEventEmitter;
 import com.picobankapi.poc.user.application.port.in.UserService;
 import com.picobankapi.poc.user.application.port.out.UserRepository;
 import com.picobankapi.poc.user.domain.User;
 import com.picobankapi.poc.user.domain.UserAlreadyExistsException;
+import com.picobankapi.poc.user.domain.UserInvalidException;
 import com.picobankapi.poc.user.domain.UserNotFoundException;
 import com.picobankapi.poc.user.domain.UserRegisteredEvent;
 
@@ -37,7 +40,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerUser(User user) throws UserAlreadyExistsException {
+    public User registerUser(User user)
+            throws UserAlreadyExistsException, IllegalArgumentException, UserInvalidException {
+        User newUser = null;
         if (user == null) {
             throw new InvalidArgumentsException("");
         }
@@ -47,7 +52,11 @@ public class UserServiceImpl implements UserService {
                 throw new UserAlreadyExistsException(user.getUsername());
             }
         }
-        User newUser = repository.save(user);
+        try {
+            newUser = repository.save(user);
+        } catch (ConstraintViolationException ex) {
+            throw new UserInvalidException();
+        }
         eventEmitter.publish(new UserRegisteredEvent(this, newUser));
         return newUser;
     }

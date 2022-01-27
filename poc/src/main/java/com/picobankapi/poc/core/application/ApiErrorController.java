@@ -1,23 +1,23 @@
 package com.picobankapi.poc.core.application;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.annotation.Priority;
 
 import com.picobankapi.poc.core.domain.ApiError;
 
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-@Order(Ordered.LOWEST_PRECEDENCE)
 @ControllerAdvice
+@Order(-2)
+@Priority(2)
 public class ApiErrorController extends ResponseEntityExceptionHandler {
 
     public static final String DEFAULT_ERROR_VIEW = "error";
@@ -28,9 +28,16 @@ public class ApiErrorController extends ResponseEntityExceptionHandler {
                 apiError, new HttpHeaders(), apiError.getStatus());
     }
 
-    @ExceptionHandler(value = Exception.class)
-    public @ResponseBody ResponseEntity<Object> defaultErrorHandler(HttpServletRequest request, Exception ex) {
-        return handleError(HttpStatus.INTERNAL_SERVER_ERROR,ex);
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
+            HttpStatus status, WebRequest request) {
+        return handleError(status, ex);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+            HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return handleError(status, ex);
     }
 
     @Override
@@ -38,6 +45,6 @@ public class ApiErrorController extends ResponseEntityExceptionHandler {
             MissingServletRequestParameterException ex, HttpHeaders headers,
             HttpStatus status, WebRequest request) {
 
-        return handleError(status,ex);
+        return handleError(status, ex);
     }
 }

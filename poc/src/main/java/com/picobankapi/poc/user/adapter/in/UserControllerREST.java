@@ -2,13 +2,10 @@ package com.picobankapi.poc.user.adapter.in;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
 import com.picobankapi.poc.user.application.UserServiceImpl;
 import com.picobankapi.poc.user.domain.User;
 import com.picobankapi.poc.user.domain.UserException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,15 +13,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserControllerREST {
 
-    @Autowired
-    private UserServiceImpl userService;
+    
+    private final UserServiceImpl userService;
 
     @PostMapping
-    public void registerUser(@Valid @RequestBody User user) throws UserException {
+    public void registerUser(@RequestBody User user) throws UserException {
         userService.registerUser(user);
     }
 
