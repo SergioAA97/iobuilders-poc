@@ -29,7 +29,7 @@ public class WalletMovementServiceImpl implements WalletMovementService {
             if (source != null) {
                 match = Long.compare(source.getId(), id) == 0;
             }
-            if (target != null) {
+            if (target != null && !match) {
                 match = Long.compare(target.getId(), id) == 0;
             }
             if (match) {
