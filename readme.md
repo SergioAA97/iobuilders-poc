@@ -1,5 +1,9 @@
 # IOBuilders POC
 
+### Sergio Alba Alcalde
+
+---
+
 The project is divided into 3 main packages:
 
 - `org.picobankapi.poc.core`: Common dependencies and classes
